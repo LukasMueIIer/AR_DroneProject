@@ -5,3 +5,6 @@
 #on Ubuntu 20.04
 
 #run chmod +x installs.sh to make this script executable
+
+sudo apt-get update
+sudo apt-get upgrade
