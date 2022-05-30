@@ -23,10 +23,12 @@ sudo apt-get upgrade
 #sudo apt-get install wiringpi
 
 
-#install pigpio libarry for gpio access https://abyz.me.uk/rpi/pigpio/cif.html
-cd ..
-wget https://github.com/joan2937/pigpio/archive/master.zip
-unzip master.zip
-cd pigpio-master
-make
-sudo make install
+#install pigpio libarry for gpio access 
+# cd ..
+# wget https://github.com/joan2937/pigpio/archive/master.zip
+# unzip master.zip
+# cd pigpio-master
+# make
+# sudo make install
+
+git clone https://github.com/WiringPi/WiringPi.git
