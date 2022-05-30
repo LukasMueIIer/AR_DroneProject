@@ -17,3 +17,6 @@ sudo apt-get upgrade
 #  rosdep install --from-paths src -i
 #  catkin_make
 #package description can be found at https://ardrone-autonomy.readthedocs.io/en/latest/index.html
+
+#install wiringPi http://wiringpi.com
+sudo apt-get install wiringpi
