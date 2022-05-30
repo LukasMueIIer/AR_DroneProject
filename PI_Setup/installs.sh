@@ -31,4 +31,9 @@ sudo apt-get upgrade
 # make
 # sudo make install
 
+#install wiring pi fork 
+cd ..
 git clone https://github.com/WiringPi/WiringPi.git
+cd WiringPi
+chmod +x build 
+./build 
