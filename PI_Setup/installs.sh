@@ -18,5 +18,15 @@ sudo apt-get upgrade
 #  catkin_make
 #package description can be found at https://ardrone-autonomy.readthedocs.io/en/latest/index.html
 
+#wiringPi is deprecated
 #install wiringPi http://wiringpi.com
-sudo apt-get install wiringpi
+#sudo apt-get install wiringpi
+
+
+#install pigpio libarry for gpio access https://abyz.me.uk/rpi/pigpio/cif.html
+cd ..
+wget https://github.com/joan2937/pigpio/archive/master.zip
+unzip master.zip
+cd pigpio-master
+make
+sudo make install
