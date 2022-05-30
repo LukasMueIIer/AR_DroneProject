@@ -8,3 +8,12 @@
 
 sudo apt-get update
 sudo apt-get upgrade
+
+##THIS PACKAGE DOES NOT SEEM TO WORK ON ARM PROCESSORS
+#install ardrone-autonomy ros package form source
+#  cd ..
+#  git clone https://github.com/AutonomyLab/ardrone_autonomy.git
+#  cd ..
+#  rosdep install --from-paths src -i
+#  catkin_make
+#package description can be found at https://ardrone-autonomy.readthedocs.io/en/latest/index.html
