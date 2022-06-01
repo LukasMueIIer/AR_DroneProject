@@ -32,6 +32,7 @@ sudo apt-get upgrade
 # sudo make install
 
 #install wiring pi fork 
+#finaly this one works
 cd ..
 git clone https://github.com/WiringPi/WiringPi.git
 cd WiringPi

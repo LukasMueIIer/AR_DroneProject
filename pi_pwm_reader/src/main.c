@@ -1,12 +1,16 @@
 #include <wiringPi.h>
+#include <stdio.h>
+
 int main (void)
 {
+  int iPinStatus = 0;
   wiringPiSetup () ;
-  pinMode (25, OUTPUT) ;
+  pinMode (25, INPUT) ;
   for (;;)
   {
-    digitalWrite (25, HIGH) ; delay (500) ;
-    digitalWrite (25,  LOW) ; delay (500) ;
+    iPinStatus = digitalRead(25);
+    cout("%d \n",iPinStatus);
+
   }
   return 0 ;
 }
