@@ -6,6 +6,7 @@ void InterruptRE(void);
 
 void InterruptFE(void);
 
+unsigned long int val;
 
 struct timeval tv_RE; //holds time for rising edge
 struct timeval tv_FE; //holds time for falling edge
@@ -24,7 +25,7 @@ int main (void)
   pinMode (25, INPUT) ;
 
   wiringPiISR (25, INT_EDGE_RISING,  InterruptRE); 
-  wiringPiISR (25, INT_EDGE_FALLING,  InterruptFE); 
+  //wiringPiISR (25, INT_EDGE_FALLING,  InterruptFE); 
   // for (;;)
   // {
   //   iPinStatus = digitalRead(25);
@@ -32,7 +33,7 @@ int main (void)
 
   // }
   for(;;){
-
+    printf("%ld \n",val);
   }
 
 
@@ -41,30 +42,33 @@ int main (void)
 
 void InterruptFE(void){
   gettimeofday(&tv_FE,NULL);
+  wiringPiISR (25, INT_EDGE_RISING,  InterruptRE);
 }
 
 void InterruptRE(void){
   struct timeval tv_local; //local time for rising edge, global for permanent memory place
 
   //seconds and ms for High/Low
-  uint iSecDiffHigh;
+  unsigned long int iSecDiffHigh;
   unsigned long int iMSDiffHigh;
-  uint iSecDiffLow;
+  unsigned long int iSecDiffLow;
   unsigned long int iMSDiffLow;
   float quote; //Quot for high and low time
   
   gettimeofday(&tv_local,NULL); //get time of interrupt
 
   iSecDiffHigh = tv_FE.tv_sec - tv_RE.tv_sec;
-  iMSDiffHigh = tv_FE.tv_usec - tv_FE.tv_usec + 1000 * iSecDiffHigh;
-
+  iMSDiffHigh = tv_FE.tv_usec - tv_RE.tv_usec + 1000000 * iSecDiffHigh;
+  
   iSecDiffLow = tv_local.tv_sec - tv_FE.tv_sec;
-  iMSDiffLow = tv_local.tv_usec - tv_FE.tv_usec + 1000 * iSecDiffLow;
+  iMSDiffLow = tv_local.tv_usec - tv_FE.tv_usec + 1000000 * iSecDiffLow;
+
+  val = iMSDiffLow;
 
   quote = ((float)iMSDiffHigh)/((float)iMSDiffLow);
-
-  printf("%f",quote);
+  
 
   tv_RE = tv_local;
+  wiringPiISR (25, INT_EDGE_FALLING,  InterruptFE);
 
 }
