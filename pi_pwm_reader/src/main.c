@@ -9,7 +9,7 @@ int main (void)
   for (;;)
   {
     iPinStatus = digitalRead(25);
-    cout("%d \n",iPinStatus);
+    printf("%d \n",iPinStatus);
 
   }
   return 0 ;
