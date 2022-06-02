@@ -8,6 +8,8 @@ void InterruptFE(void);
 
 unsigned long int val;
 
+  
+
 struct timeval tv_RE; //holds time for rising edge
 struct timeval tv_FE; //holds time for falling edge
 
@@ -33,7 +35,8 @@ int main (void)
 
   // }
   for(;;){
-    printf("%ld \n",val);
+    printf("%d, %ld, %d, %ld \n",tv_RE.tv_sec,tv_RE.tv_usec,tv_FE.tv_sec,tv_FE.tv_usec);
+
   }
 
 
@@ -47,12 +50,12 @@ void InterruptFE(void){
 
 void InterruptRE(void){
   struct timeval tv_local; //local time for rising edge, global for permanent memory place
-
-  //seconds and ms for High/Low
   unsigned long int iSecDiffHigh;
   unsigned long int iMSDiffHigh;
   unsigned long int iSecDiffLow;
   unsigned long int iMSDiffLow;
+  //seconds and ms for High/Low
+
   float quote; //Quot for high and low time
   
   gettimeofday(&tv_local,NULL); //get time of interrupt
