@@ -1,77 +1,59 @@
 #include <wiringPi.h>
-#include <stdio.h>
 #include <sys/time.h>
+#include "ros/ros.h"
 
-void InterruptRE(void);
 
-void InterruptFE(void);
-
-unsigned long int val;
+int state; //check if 
 
   
 
 struct timeval tv_RE; //holds time for rising edge
 struct timeval tv_FE; //holds time for falling edge
+struct timeval tv_local;
+float ratio;
 
-int main (void)
+void InterruptBoth(void){
+  int HoL = digitalRead(25);
+  unsigned long int LPhase;
+  unsigned long int HPhase;
+  if(HoL == 1 && state){//were high and havend treated high yet
+    gettimeofday(&tv_RE,NULL);
+    state = !state;
+  }else if(HoL == 0 && !state){
+    gettimeofday(&tv_local,NULL);
+    LPhase = tv_RE.tv_usec - tv_FE.tv_usec + 1000000 * (tv_RE.tv_sec - tv_FE.tv_sec);
+    HPhase = tv_local.tv_usec - tv_RE.tv_usec + 1000000 * (tv_local.tv_sec - tv_RE.tv_sec);
+    ratio = ((float)HPhase)/((float)LPhase);
+    tv_FE = tv_local;
+    state = !state;
+  }
+};
+
+int main (int argc,char * argv[])
 {
+  ros::init(argc, argv, "pwm_reader"); //start ros
 
-
+  //pwm reading setup
+  state = FALSE;
   //set initial values for rising and falling edge that arent identical
   gettimeofday(&tv_RE,NULL);
   delay(200);
   gettimeofday(&tv_FE,NULL);
-
   //set up pins
   wiringPiSetup () ;
   pinMode (25, INPUT) ;
+  wiringPiISR (25, INT_EDGE_BOTH,  InterruptBoth); 
+ 
 
-  wiringPiISR (25, INT_EDGE_RISING,  InterruptRE); 
-  //wiringPiISR (25, INT_EDGE_FALLING,  InterruptFE); 
-  // for (;;)
-  // {
-  //   iPinStatus = digitalRead(25);
-  //   print("%d \n",iPinStatus);
+  ros::NodeHandle n;  //Handle for ROS functions
 
-  // }
-  for(;;){
-    printf("%d, %ld, %d, %ld \n",tv_RE.tv_sec,tv_RE.tv_usec,tv_FE.tv_sec,tv_FE.tv_usec);
+  ros::Rate loop_rate(10);
 
+  while (ros::ok()){
+    ROS_INFO("%f", ratio);
+    loop_rate.sleep();
   }
-
 
   return 0 ;
 }
 
-void InterruptFE(void){
-  gettimeofday(&tv_FE,NULL);
-  wiringPiISR (25, INT_EDGE_RISING,  InterruptRE);
-}
-
-void InterruptRE(void){
-  struct timeval tv_local; //local time for rising edge, global for permanent memory place
-  unsigned long int iSecDiffHigh;
-  unsigned long int iMSDiffHigh;
-  unsigned long int iSecDiffLow;
-  unsigned long int iMSDiffLow;
-  //seconds and ms for High/Low
-
-  float quote; //Quot for high and low time
-  
-  gettimeofday(&tv_local,NULL); //get time of interrupt
-
-  iSecDiffHigh = tv_FE.tv_sec - tv_RE.tv_sec;
-  iMSDiffHigh = tv_FE.tv_usec - tv_RE.tv_usec + 1000000 * iSecDiffHigh;
-  
-  iSecDiffLow = tv_local.tv_sec - tv_FE.tv_sec;
-  iMSDiffLow = tv_local.tv_usec - tv_FE.tv_usec + 1000000 * iSecDiffLow;
-
-  val = iMSDiffLow;
-
-  quote = ((float)iMSDiffHigh)/((float)iMSDiffLow);
-  
-
-  tv_RE = tv_local;
-  wiringPiISR (25, INT_EDGE_FALLING,  InterruptFE);
-
-}
