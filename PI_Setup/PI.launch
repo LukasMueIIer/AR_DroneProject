@@ -1,0 +1,9 @@
+
+
+
+<launch>
+
+    <param name="pi_pwm_configPath" value="HEWOWWW"/>
+    <node pkg="pi_pwm_reader" name="pwm_reader_node" type="pi_pwm_reader_node"/>
+
+</launch>

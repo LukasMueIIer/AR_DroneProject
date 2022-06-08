@@ -35,7 +35,8 @@ int main (int argc,char * argv[])
 {
   ros::init(argc, argv, "pwm_reader"); //start ros
   std::string configFilePath; 
-  if(!getParam ("pi_pwm_configPath",configFilePath)){
+  ros::NodeHandle n;  //Handle for ROS functions
+  if(! n.getParam ("pi_pwm_configPath",configFilePath)){
     ROS_INFO("could not find pi_pwm_configPath parameter!");
     return 0;
   }
@@ -52,7 +53,7 @@ int main (int argc,char * argv[])
   wiringPiISR (25, INT_EDGE_BOTH,  InterruptBoth); 
  
 
-  ros::NodeHandle n;  //Handle for ROS functions
+ 
 
   ros::Rate loop_rate(10);
 
