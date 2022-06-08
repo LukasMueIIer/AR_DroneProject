@@ -1,9 +1,11 @@
 #include <wiringPi.h>
 #include <sys/time.h>
 #include "ros/ros.h"
+#include <string>
 
 
 int state; //check if 
+
 
   
 
@@ -32,6 +34,11 @@ void InterruptBoth(void){
 int main (int argc,char * argv[])
 {
   ros::init(argc, argv, "pwm_reader"); //start ros
+  std::string configFilePath; 
+  if(!getParam ("pi_pwm_configPath",configFilePath)){
+    ROS_INFO("could not find pi_pwm_configPath parameter!");
+    return 0;
+  }
 
   //pwm reading setup
   state = FALSE;

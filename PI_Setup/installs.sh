@@ -38,3 +38,7 @@ git clone https://github.com/WiringPi/WiringPi.git
 cd WiringPi
 chmod +x build 
 ./build 
+
+#for pi_pwm_read to word it must be run on sudo rights 
+#therefore elevate console to sudo
+sudo su

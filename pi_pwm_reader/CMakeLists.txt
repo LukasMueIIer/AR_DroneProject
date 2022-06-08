@@ -10,6 +10,7 @@ project(pi_pwm_reader)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
+  roscpp
 )
 
 ## System dependencies are found with CMake's conventions
@@ -132,7 +133,10 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/pi_pwm_reader_node.cpp)
+
+add_executable(${PROJECT_NAME}_node src/main.cpp)
+target_link_libraries(${PROJECT_NAME}_node wiringPi)
+target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
