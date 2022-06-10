@@ -2,6 +2,8 @@
 #include <sys/time.h>
 #include "ros/ros.h"
 #include <string>
+#include "std_msgs/Float64.h"
+
 
 
 int state; //check if 
@@ -13,6 +15,7 @@ struct timeval tv_RE; //holds time for rising edge
 struct timeval tv_FE; //holds time for falling edge
 struct timeval tv_local;
 float ratio;
+ros::Publisher pwm_pub;
 
 void InterruptBoth(void){
   int HoL = digitalRead(25);
@@ -31,11 +34,14 @@ void InterruptBoth(void){
   }
 };
 
+ros::NodeHandle * pN;
+
 int main (int argc,char * argv[])
 {
   ros::init(argc, argv, "pwm_reader"); //start ros
   std::string configFilePath; 
   ros::NodeHandle n;  //Handle for ROS functions
+  pN = &n;
   if(! n.getParam ("pi_pwm_configPath",configFilePath)){
     ROS_INFO("could not find pi_pwm_configPath parameter!");
     return 0;
@@ -43,6 +49,9 @@ int main (int argc,char * argv[])
 
   //pwm reading setup
   state = FALSE;
+  pwm_pub = n.advertise<std_msgs::Float64>("PWM_1", 1000);
+  std_msgs::Float64 msg;
+
   //set initial values for rising and falling edge that arent identical
   gettimeofday(&tv_RE,NULL);
   delay(200);
@@ -59,6 +68,8 @@ int main (int argc,char * argv[])
 
   while (ros::ok()){
     ROS_INFO("%f", ratio);
+    msg.data = ratio;
+    pwm_pub.publish(msg);
     loop_rate.sleep();
   }
 
