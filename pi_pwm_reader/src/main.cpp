@@ -3,6 +3,7 @@
 #include "ros/ros.h"
 #include <string>
 #include "std_msgs/Float64.h"
+#include <functional>
 
 #define pinAmount 8   //this holds the max amount of pins that can be used
                       //doesnt indicate the actuall amount but determines memory reserved
@@ -22,7 +23,7 @@ float ratio[pinAmount];             //ratio of high to low phase on pin to calc 
 ros::Publisher pwm_pub[pinAmount];  //publishers for publishing on ros topics
 
 void InterruptBoth(int iInterrupt){
-  int HoL = digitalRead(InteruptToPin(iInterrupt)); //get Pin belongign to interrupt and check its state
+  int HoL = digitalRead(InteruptToPin[iInterrupt]); //get Pin belongign to interrupt and check its state
   
   unsigned long int LPhase; //hold the low and high phase duration for ratio calculation
   unsigned long int HPhase;
@@ -73,8 +74,8 @@ int main (int argc,char * argv[])
   {
     std::string ls; 
     for(int i = 0; i < actualPins; ++i){  //loop over interrupts to be set
-      ls.clear();
-      ls << "PWM_" << i;  
+      ls = "PWM_";
+      ls.append(std::to_string(i));
       pwm_pub[i] = n.advertise<std_msgs::Float64>(ls, 1000);  //create topic
       state[i] = FALSE; //set a initial state
 
@@ -84,7 +85,8 @@ int main (int argc,char * argv[])
       gettimeofday(&tv_FE[i],NULL);
      
       pinMode(InteruptToPin[i], INPUT); //set Interupt Pin to read
-      wiringPiISR (InteruptToPin[i], INT_EDGE_BOTH,  [=i](){InterruptBoth(i)}); //set Interrupt Function
+       std::function<void()> InterFunc = [i](){InterruptBoth(i);};
+      wiringPiISR (InteruptToPin[i], INT_EDGE_BOTH, *InterFunc.target<void(*)()>()); //set Interrupt Function
     }
 
   }
@@ -95,7 +97,7 @@ int main (int argc,char * argv[])
 
   while (ros::ok()){
     for(int i = 0; i < actualPins; ++i){ //loop through all ratios and publish
-      msg.data = ratio;
+      msg.data = ratio[i];
       pwm_pub[i].publish(msg);
     }
     
