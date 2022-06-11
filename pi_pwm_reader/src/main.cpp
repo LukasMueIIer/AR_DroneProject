@@ -46,6 +46,18 @@ void InterruptBoth(int iInterrupt){
   }
 };
 
+template<int N>     //Template function so each Interrupt has its own function and knows its ID
+void PinFunc(){
+  InterruptBoth(N);
+}
+
+void (*InterruptFArray[pinAmount])(); //Array of function pointers that are used to assigne each
+                                      //Interrupt a function that knows its own ID. I tried to use
+                                      //Lambda functions but there is no way of capturing and converting
+                                      //the function to a void(*)(), so were stuck with creating 
+                                      //functions for each Interrupt at Compile time
+                                      //this means if pinAmount is larger than actuall pins
+                                      //the Programm is larger than it has to be
 
 
 int main (int argc,char * argv[])
@@ -69,8 +81,23 @@ int main (int argc,char * argv[])
     InteruptToPin[0] = 25;  //save PIN ID
     InteruptToPin[1] = 24;
   }
+
+  //Creating the functions for each Interrupt
+  {
+    //Soooo this is kinda anoying you have to manually adjust this section to fit pinAmount
+    //it doesnt take much time, but it would be nicer if this could be done using macros
+    //but I did not find a macro "for loop" that copy pastes code with small modification
+    InterruptFArray[0] = PinFunc<0>;
+    InterruptFArray[1] = PinFunc<1>;
+    InterruptFArray[2] = PinFunc<2>;
+    InterruptFArray[3] = PinFunc<3>;
+    InterruptFArray[4] = PinFunc<4>;
+    InterruptFArray[5] = PinFunc<5>;
+    InterruptFArray[6] = PinFunc<6>;
+    InterruptFArray[7] = PinFunc<7>;
+  }
   
-  //SET UP ROS TOPICS
+  //SET UP ROS TOPICS AND PINS
   {
     std::string ls; 
     for(int i = 0; i < actualPins; ++i){  //loop over interrupts to be set
@@ -85,8 +112,7 @@ int main (int argc,char * argv[])
       gettimeofday(&tv_FE[i],NULL);
      
       pinMode(InteruptToPin[i], INPUT); //set Interupt Pin to read
-       std::function<void()> InterFunc = [i](){InterruptBoth(i);};
-      wiringPiISR (InteruptToPin[i], INT_EDGE_BOTH, *InterFunc.target<void(*)()>()); //set Interrupt Function
+      wiringPiISR (InteruptToPin[i], INT_EDGE_BOTH, InterruptFArray[i]); //set Interrupt Function
     }
 
   }
