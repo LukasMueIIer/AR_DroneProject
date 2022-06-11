@@ -20,6 +20,9 @@ struct timeval tv_local[pinAmount]; //placeholder to have reserved memory for
 
 float ratio[pinAmount];             //ratio of high to low phase on pin to calc pwm value
 
+float Zero[pinAmount];              //float ratio for minimal pwm value
+float Max[pinAmount];               //float ratio for maximal pwm value
+
 ros::Publisher pwm_pub[pinAmount];  //publishers for publishing on ros topics
 
 void InterruptBoth(int iInterrupt){
@@ -59,6 +62,16 @@ void (*InterruptFArray[pinAmount])(); //Array of function pointers that are used
                                       //this means if pinAmount is larger than actuall pins
                                       //the Programm is larger than it has to be
 
+int RatioTo100(int iID, float ratio){ //converts ratio to range 0-100
+  float newRat = ratio - Zero[iID];
+  newRat = newRat / (Max[iID] - Zero[iID]);
+  if(newRat < 0){
+    newRat = 0;
+  }else if(newRat > 1){
+    newRat = 1;
+  }
+  return round(newRat * 100);
+}
 
 int main (int argc,char * argv[])
 {
@@ -80,6 +93,12 @@ int main (int argc,char * argv[])
 
     InteruptToPin[0] = 25;  //save PIN ID
     InteruptToPin[1] = 24;
+
+    Zero[0] = 0.05f;    //Ratio for a PWM minimum
+    Zero[1] = 0.05f;
+
+    Max[0] = 0.1f;      //Ratio for a PWM Maximum
+    Max[1] = 0.1f;
   }
 
   //Creating the functions for each Interrupt
@@ -123,7 +142,7 @@ int main (int argc,char * argv[])
 
   while (ros::ok()){
     for(int i = 0; i < actualPins; ++i){ //loop through all ratios and publish
-      msg.data = ratio[i];
+      msg.data = RatioTo100(i, ratio[i]);
       pwm_pub[i].publish(msg);
     }
     
