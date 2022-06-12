@@ -88,28 +88,29 @@ int main (int argc,char * argv[])
     std::string configFilePath;           
     if(! n.getParam ("pi_pwm_configPath",configFilePath)){
       ROS_INFO("could not find pi_pwm_configPath parameter!");
-      return 0;
+      return 1;
     }
     std::ifstream file(configFilePath); //Open the config File; this object is destoyed at scope and
                                         //automatically closes the file
 
     int i = 0;//current line
     if(file.good()){                    //Check if the file stream works if not throw error
-
+      ROS_INFO("Found config file!");
       while(!file.eof()){               //read line after line
-        file >> InteruptToPin[i] >> Zero[i] >> Max[i];
+        file >> InteruptToPin[i] >> Zero[i] >> Max[i];        
+        ROS_INFO("PIN %d as PWM_%d with min at %f and max at %f",InteruptToPin[i],i,Zero[i],Max[i]);
         ++i;
       }
 
-      actualPins = i - 1;
-      if(actualPins == -1){  //Check if we actually have any pins set
+      actualPins = i;
+      if(actualPins == 0){  //Check if we actually have any pins set
         ROS_INFO("config File didnt contain any pins!");
-        return 0;
+        return 2;
       }
 
     }else{    //Stream not good, post error and exit
       ROS_INFO("pi_pwm_configPath file could not be read!");
-      return 0;
+      return 3;
     }
   }
 
