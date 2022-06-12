@@ -1,9 +1,6 @@
-
-
-
 <launch>
 
-    <param name="pi_pwm_configPath" value="HEWOWWW"/>
+    <param name="pi_pwm_configPath" value="/home/user/AR_Drone/src/pi_pwm_reader/config"/>
     <node pkg="pi_pwm_reader" name="pwm_reader_node" type="pi_pwm_reader_node"/>
 
 </launch>

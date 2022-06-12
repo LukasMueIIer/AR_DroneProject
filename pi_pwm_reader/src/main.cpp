@@ -4,6 +4,8 @@
 #include <string>
 #include "std_msgs/Float64.h"
 #include <functional>
+#include <iostream>
+#include <fstream>
 
 #define pinAmount 8   //this holds the max amount of pins that can be used
                       //doesnt indicate the actuall amount but determines memory reserved
@@ -88,17 +90,27 @@ int main (int argc,char * argv[])
       ROS_INFO("could not find pi_pwm_configPath parameter!");
       return 0;
     }
-    //dummy load function not implemented yet
-    actualPins = 2; //two actual pins
+    std::ifstream file(configFilePath); //Open the config File; this object is destoyed at scope and
+                                        //automatically closes the file
 
-    InteruptToPin[0] = 25;  //save PIN ID
-    InteruptToPin[1] = 24;
+    int i = 0;//current line
+    if(file.good()){                    //Check if the file stream works if not throw error
 
-    Zero[0] = 0.05f;    //Ratio for a PWM minimum
-    Zero[1] = 0.05f;
+      while(!file.eof()){               //read line after line
+        file >> InteruptToPin[i] >> Zero[i] >> Max[i];
+        ++i;
+      }
 
-    Max[0] = 0.1f;      //Ratio for a PWM Maximum
-    Max[1] = 0.1f;
+      actualPins = i - 1;
+      if(actualPins == -1){  //Check if we actually have any pins set
+        ROS_INFO("config File didnt contain any pins!");
+        return 0;
+      }
+
+    }else{    //Stream not good, post error and exit
+      ROS_INFO("pi_pwm_configPath file could not be read!");
+      return 0;
+    }
   }
 
   //Creating the functions for each Interrupt
