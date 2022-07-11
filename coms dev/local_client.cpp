@@ -18,7 +18,7 @@ int main(int argc, char ** argv){
     hints.ai_family = AF_INET; //we wanna host IPv4
     hints.ai_socktype = SOCK_STREAM; //we wannt TCP/IP
     
-    status = getaddrinfo("localhost","3187",&hints,&server_address);
+    status = getaddrinfo("192.168.2.119","3187",&hints,&server_address);
     if(status != 0){
         fprintf(stderr,"gettaddrinfo error: %s\n", gai_strerror(status)); //print standard error
         exit(1);

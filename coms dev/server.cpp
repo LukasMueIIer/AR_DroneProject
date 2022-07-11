@@ -22,7 +22,7 @@ int main(int argc, char ** argv){
 
     struct addrinfo * hostinfo;     //Pointer to linked list containing server info
 
-    status = getaddrinfo(NULL,"3187",&hints,&hostinfo); //get address info
+    status = getaddrinfo(NULL,"3188",&hints,&hostinfo); //get address info
 
     if(status != 0){    //error occured
         fprintf(stderr,"gettaddrinfo error: %s\n", gai_strerror(status)); //print standard error
@@ -78,9 +78,12 @@ int main(int argc, char ** argv){
 
     std::cout << rec_buffer;
     
+
     char test[123] = "HEWWOWWWW";
+    memset(test,sizeof(char)*123);
 
     send(client,test,strlen(test),0);
+
   //  close(client);
   //  close(server_sock);
 }
